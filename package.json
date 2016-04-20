@@ -1,0 +1,24 @@
+{
+  "name": "meteor_aframe_web_audio_api",
+  "version": "1.0.0",
+  "description": "sandbox for sound in VR",
+  "main": "/client/meteor_aframe_WebAudioAPI.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AddisonFreeman/meteor_aframe_WebAudioAPI.git"
+  },
+  "keywords": [
+    "aframe",
+    "WebAudioAPI",
+    "meteor"
+  ],
+  "author": "Addison Freeman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AddisonFreeman/meteor_aframe_WebAudioAPI/issues"
+  },
+  "homepage": "https://github.com/AddisonFreeman/meteor_aframe_WebAudioAPI"
+}
