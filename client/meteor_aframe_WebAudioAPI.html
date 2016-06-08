@@ -1,25 +1,32 @@
 <head>
   <title>meteor_Sandbox_WebAudioAPI</title>
-  <script src="https://aframe.io/releases/latest/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
+  <script src="https:ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="https://github.com/donmccurdy/aframe-extras/blob/master/src/controls/universal-controls.js"></script>
+  <script src="https://sandbox.donmccurdy.com/vr/aframe-extras.js"></script>
 </head>
-
 <body>
-  <a-scene>
-    <!--
-    <a-entity position="5 0 0" rotation="0 0 0">
-      <a-animation attribute="rotation"
-          to="0 360 0"
-          dur="10000"
-          fill="forwards"
-          repeat="indefinite"></a-animation>
-    </a-entity>
-    -->
-    <a-cube rotation="180 45 98"></a-cube>
-    <a-camera cursor-scale="3" position="0 2 6"></a-camera>
-    <a-sky color="#FF99FF"></a-sky>
- </a-scene>
- <!-- {{> audio}}-->
-</body>
+ {{> audio}}
+<a-scene physics>
+  <!-- Ground -->
+  <a-entity static-body geometry="primitive: box; depth: 5000; height: 0.1; width: 5000" material="shader: flat; side: double; src: url(grass.jpg); repeat: 1111 1111"></a-entity>
 
+  <!-- Link Sphere -->
+  <a-entity id="link" geometry="primitive: sphere; radius: 0.3" position="0 1 -5" material="transparent: true;
+    src: url(ball.png)"></a-entity>
+
+ <!-- Camera -->
+ <a-entity id="camera" position="0 0 5">
+  <a-entity camera universal-controls kinematic-body jump-ability="enableDoubleJump: true; distance: 3;" position="0 2.2 0">
+   <a-entity cursor="fuse: true; timeout: 100; maxDistance: 15;" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: red" position="0 0 -2"></a-entity>
+   </a-entity>
+  <a-animation attribute="position" begin="navigate-to-link" easing="linear" to="0 0 -5" dur="5000"></a-animation>
+ </a-entity>
+
+ <!-- Lighting and Background -->
+ <a-sky src="sky.jpg" radius="5000"></a-sky>
+</a-scene>
+
+</body>
 <template name="audio">
 </template>

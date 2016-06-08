@@ -1,1 +1,7 @@
-/* CSS declarations go here */
+.box {
+  height: 100px;
+  width: 100px;
+  background-color: red;
+  position: fixed;
+  top: 0px;
+}
