@@ -2,4 +2,4 @@
 
 Binaural audio, multiplayer controls in WebVR
 
-Run on meteor
+run `meteor` in root directory
