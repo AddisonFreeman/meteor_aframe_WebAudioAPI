@@ -1,30 +1,42 @@
 $ = jQuery;
 Template.peer.onCreated(function () {
+
   window.peer = new Peer({
     key: 'npgldigfyu3gcik9',
     debug: 3,
     config: {'iceServers': [
-        { url: 'stun:stun.l.google.com:19302' },
-        { url: 'stun:stun1.l.google.com:19302' },
-      ]}
+      { url: 'stun:stun.l.google.com:19302' },
+      { url: 'stun:stun1.l.google.com:19302' },
+    ]}
+  });
+  peer.on('open', function () {
+    console.log(peer.id);
   });
 
-peer.on('open', function () {
-  console.log(peer.id);
-});
-
-peer.on('call', function (incomingCall) {
-  window.currentCall = incomingCall;
-  incomingCall.answer(window.localStream);
-  incomingCall.on('stream', function (remoteStream) {
-    window.remoteStream = remoteStream;
-    console.log(window.remoteStreatm);
-  })
-})
 
 });
 
 window.onload = function() {
+  var cam = document.querySelector("#mainCamera");
+  var iceberg = document.querySelector("#iceberg");
+
+  // function iceberg() {
+  //   iceberg.setAttribute('position', (cam.getAttribute('position').x + 10+' '+cam.getAttribute('position').y+' '+cam.getAttribute('position').z));
+  // }
+
+  peer.on('connection', function (conn) {
+    console.log("you're connected!"+conn);
+    conn.on('open', function() {
+      conn.on('data', function(data) {
+        iceberg.setAttribute('position', data);
+      });
+    });  
+  });
+
+
+
+
+  // ----------------- Audio Things
   var AudioContext = window.AudioContext || window.webkitAudioContext;
   var audioContext = new AudioContext();
   // var playerBuffer = audioContext.createBuffer(2, 200, audioContext.sampleRate);
