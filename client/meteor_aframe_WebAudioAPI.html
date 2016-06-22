@@ -1,32 +1,63 @@
 <head>
   <title>meteor_Sandbox_WebAudioAPI</title>
+  <!-- <script src="/lib/js/binaural.js"></script> -->
   <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
   <script src="https:ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="https://github.com/donmccurdy/aframe-extras/blob/master/src/controls/universal-controls.js"></script>
   <script src="https://sandbox.donmccurdy.com/vr/aframe-extras.js"></script>
+  <!-- <script src="./universal-controls.js"></script> -->
+  <script src="./hrtf.js"></script>  
+  <script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+  <!-- <script src="dist/aframe-no-click-look-controls.min.js"></script> -->
 </head>
 <body>
- {{> audio}}
-<a-scene physics>
-  <!-- Ground -->
-  <a-entity static-body geometry="primitive: box; depth: 5000; height: 0.1; width: 5000" material="shader: flat; side: double; src: url(grass.jpg); repeat: 1111 1111"></a-entity>
-
-  <!-- Link Sphere -->
-  <a-entity id="link" geometry="primitive: sphere; radius: 0.3" position="0 1 -5" material="transparent: true;
-    src: url(ball.png)"></a-entity>
-
- <!-- Camera -->
- <a-entity id="camera" position="0 0 5">
-  <a-entity camera universal-controls kinematic-body jump-ability="enableDoubleJump: true; distance: 3;" position="0 2.2 0">
-   <a-entity cursor="fuse: true; timeout: 100; maxDistance: 15;" geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03" material="color: red" position="0 0 -2"></a-entity>
-   </a-entity>
-  <a-animation attribute="position" begin="navigate-to-link" easing="linear" to="0 0 -5" dur="5000"></a-animation>
- </a-entity>
-
- <!-- Lighting and Background -->
- <a-sky src="sky.jpg" radius="5000"></a-sky>
-</a-scene>
+<!-- 	<audio id="source" 
+		   src="http://localhost:3000/04_Rhodes.wav" 
+		   controls 
+		   autoplay 
+		   loop>		   
+	</audio> -->
+	<a-scene 
+	  camera 
+	  physics 
+	  proxy-controls="enabled: true;
+					  debug: true;
+					  pairCode: 'poetic';
+					  enableOverlay: true;">
+   		<a-box 
+   		  static-body 
+   		  color="#CBF" 
+   		  width="4" 
+   		  height="10" 
+   		  depth="2"
+          position="-10 2 -5" 
+          rotation="45 45 45" 
+          scale="2 0.5 3">
+        </a-box>
+  		<!-- ground -->
+  		<a-entity 
+  			static-body 
+  			geometry="primitive: box; 
+  					  depth:100; 
+  					  height:1; 
+  					  width:100;" 
+  			material="side: double; 
+  					  color: blue; 
+  					  repeat: 100000000 1000000;">
+  		</a-entity>
+  		<a-entity 
+  			camera 
+  			universal-controls
+  			keyboard-controls
+  			gamepad-controls 
+  			kinematic-body 
+  			jump-ability="enableDoubleJump: true; 
+  						  distance: 10;" 
+		    position="0 2.2 0">
+  		</a-entity>
+	</a-scene>
+{{> peer}}
 
 </body>
-<template name="audio">
+<template name="peer">
 </template>
+
