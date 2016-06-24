@@ -1,4 +1,4 @@
-var panner, cam, ice, p2, palyer2, pid, ray, peer, peers, connections;
+var panner, cam, ice, p2, pfetch, player2, pid, ray, peer, peers, connections, pSelectorId;
 
 
 import { Meteor } from 'meteor/meteor';
@@ -129,7 +129,7 @@ AFRAME.registerComponent('positionalAudio', {
 	  ray = this.raycaster;
 	  cam = document.querySelector("#mainCamera");
 	  ice = document.querySelector("#iceberg");
-	  p2 = document.querySelector("#player2");
+	  player2 = document.querySelector("#player2");
 	  
 	  // ----------------- Audio Things
 	  var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -208,8 +208,10 @@ AFRAME.registerComponent('peer', {
 	init: function() {
 	    cam = document.querySelector("#mainCamera");
 		ice = document.querySelector("#iceberg");
-		player2 = document.querySelector("#player2");		
+		player2 = document.querySelector("#player2");
+				
 		connections = [];
+
 /*
 		var vowels = [1,5,9,15,21];
 		var one = Math.floor(Math.random()*10);
@@ -219,13 +221,19 @@ AFRAME.registerComponent('peer', {
 		one = (one === three) ? one+2 : one;  
 		var pid = String.fromCharCode(97+ one)+''+String.fromCharCode(vowels[Math.floor(Math.random()*vowels.length)]+96)+''+String.fromCharCode(97+ three);
 */
+
 		Meteor.subscribe('peers', () => {
  			peers = Peers.find().fetch();
+
 /*
 			peers.forEach((obj) => {
 		        Peers.remove(obj._id);
 		   	});
+		});
 */
+			pSelectorId = this.el.id;
+			console.log(pSelectorId);
+
 			console.log('current peers: '+Peers.find().fetch());		
 
   			peer = new Peer(Peers.constructorParams);
@@ -250,10 +258,10 @@ AFRAME.registerComponent('peer', {
 
 				pcursor.observeChanges({ 
 					added: function (objAddedId) {
-						p2 = pcursor.fetch(objAddedId);
+						pfetch = pcursor.fetch(objAddedId);
 						console.log('obsv');
-						console.log(p2);
- 						p2.forEach((otherPeer) => {
+						console.log(pfetch);
+ 						pfetch.forEach((otherPeer) => {
 							if(otherPeer.pid!=pid) {
 								connections.push(peer.connect(otherPeer.pid));
 								console.log('obsv changes: pid2:'+otherPeer.pid+' pid:'+pid);
@@ -268,13 +276,16 @@ AFRAME.registerComponent('peer', {
 // 			  console.log("you're connected! | "+conn);
 			  conn.on('open', function() {
 			    conn.on('data', function(data) {
-				    console.log('i gots data');
-					player2.setAttribute('position', data);
+				    console.log('i gots data'+pSelectorId);
+				    document.querySelector("#"+pSelectorId).setAttribute('position', data);
 			    });
 			  });		
 			});   	
 
 		});
+
+
+
 	},//end init
 	tick: function() {
 // 		console.log(connections); 
