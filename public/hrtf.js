@@ -3,8 +3,13 @@ function HRTFContainer() {
 	var hrir =  {};
 	var triangulation = {
 		points: [],
-		triangles: []
+		triangles: [],
+		loaded: false,
 	};
+	
+	this.ready = function() {
+	  return triangulation.loaded;
+	}
 
 	this.loadHrir = function(file, onLoad) {
 		var oReq = new XMLHttpRequest();
@@ -56,6 +61,7 @@ function HRTFContainer() {
 				hrir = ir;
 				triangulation.triangles = Delaunay.triangulate(points);
 				triangulation.points = points;
+				triangulation.loaded = true;
 				if (typeof onLoad !== "undefined")
 					onLoad();
 			}
@@ -67,6 +73,7 @@ function HRTFContainer() {
 	}
 
 	this.interpolateHRIR = function(azm, elv) {
+		
 		var triangles = triangulation.triangles;
 		var points = triangulation.points;
 		var i = triangles.length - 1;
@@ -188,6 +195,7 @@ function HRTFPanner(audioContext, sourceNode, hrtfContainer) {
 		This is supposed to be called each time a listener or source position changes.	
 	*/
 	this.update = function(azimuth, elevation) {
+		if(!hrtfContainer.ready()) return false;
 		targetConvolver.fillBuffer(hrtfContainer.interpolateHRIR(azimuth, elevation));
 		// start crossfading
 		var crossfadeDuration = 25;
