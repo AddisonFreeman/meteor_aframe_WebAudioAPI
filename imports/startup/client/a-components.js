@@ -1,10 +1,8 @@
-var panner, cam, ice, p2, ray, peer, peers, connections;
+var panner, cam, ice, p2, palyer2, pid, ray, peer, peers, connections;
 
 
 import { Meteor } from 'meteor/meteor';
 import { Peers } from "../../api/peers/peers";
-
-console.log(Peers);
 
 AFRAME.registerComponent('projectile', {
   schema: {
@@ -208,6 +206,9 @@ AFRAME.registerComponent('FOA', {
 AFRAME.registerComponent('peer', {
 	schema: {type: 'int', default: 2 },
 	init: function() {
+	    cam = document.querySelector("#mainCamera");
+		ice = document.querySelector("#iceberg");
+		player2 = document.querySelector("#player2");		
 		connections = [];
 /*
 		var vowels = [1,5,9,15,21];
@@ -218,56 +219,67 @@ AFRAME.registerComponent('peer', {
 		one = (one === three) ? one+2 : one;  
 		var pid = String.fromCharCode(97+ one)+''+String.fromCharCode(vowels[Math.floor(Math.random()*vowels.length)]+96)+''+String.fromCharCode(97+ three);
 */
-		Meteor.subscribe('peers');
-
-   	    peer = new Peer({
-   			key: 'npgldigfyu3gcik9',
-   			debug: 3,
-   			config: {'iceServers': [
-	   			{ url: 'stun:stun.l.google.com:19302' },
-	   			{ url: 'stun:stun1.l.google.com:19302' },
-	   		]}
-	   	});
-	   	peer.on('open', function () {
-	   		var pid = peer.id;
-	   		
-	   		peers = Peers.find().fetch();
-	   		console.log(peers);
-	   		
+		Meteor.subscribe('peers', () => {
+ 			peers = Peers.find().fetch();
 /*
-	   		 peers.forEach((obj) => {
-		   		 Peers.remove(obj._id);
-			 });		
-
-	   	
-	   		peers = Peers.find().fetch();
-	   		console.log(peers);
+			peers.forEach((obj) => {
+		        Peers.remove(obj._id);
+		   	});
 */
-	   				
-			Peers.insert({
-				pid,
-			},
-			(err, res) => {
-				if(!err) {	
-			        peers.forEach((obj) => {
-				        connections.push(peer.connect(obj.pid));
-			        });				
-			    } else {
-				    console.log(err);
-			    }
-			});
+			console.log('current peers: '+Peers.find().fetch());		
+
+  			peer = new Peer(Peers.constructorParams);
+
+ 			peer.on('open', () => {
+	 			var pid = peer.id;	 			   	
+	 			console.log('My pid: '+pid);
+				
+				Peers.insert({
+					pid
+				}, (err, res) => {
+					if(!err) {	
+						console.log("added "+pid+" to Peers | current peers: "+Peers.find().fetch());    
+			    	} else {
+					    console.log(pid+' not added current peers: | '+Peers.find().fetch());
+						console.log(err);
+			    	}
+				});
+
+				var pcursor = Peers.find();
+
+
+				pcursor.observeChanges({ 
+					added: function (objAddedId) {
+						p2 = pcursor.fetch(objAddedId);
+						console.log('obsv');
+						console.log(p2);
+ 						p2.forEach((otherPeer) => {
+							if(otherPeer.pid!=pid) {
+								connections.push(peer.connect(otherPeer.pid));
+								console.log('obsv changes: pid2:'+otherPeer.pid+' pid:'+pid);
+							}
+						});
+					}
+				});
+ 			});
+
+
+			peer.on('connection', function (conn) {
+// 			  console.log("you're connected! | "+conn);
+			  conn.on('open', function() {
+			    conn.on('data', function(data) {
+				    console.log('i gots data');
+					player2.setAttribute('position', data);
+			    });
+			  });		
+			});   	
+
 		});
-		peer.on('connection', function (conn) {
-		  console.log("you're connected! | "+conn);
-		  conn.on('open', function() {
-		    conn.on('data', function(data) {
-		      p2.setAttribute('position', data);
-		    });
-		  });  
-		}); 	
-	}, //end init
+	},//end init
 	tick: function() {
+// 		console.log(connections); 
 		connections.forEach( (c) => {
+			console.log('sending');
 			c.send(cam.getAttribute('position'));
 		});
 	}
@@ -275,4 +287,4 @@ AFRAME.registerComponent('peer', {
 
 
 //https://www.smashingmagazine.com/2016/06/make-music-in-the-browser-with-a-web-audio-theremin/
-// });
+
