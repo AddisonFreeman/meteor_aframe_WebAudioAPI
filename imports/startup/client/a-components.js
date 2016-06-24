@@ -165,8 +165,8 @@ AFRAME.registerComponent('positionalAudio', {
 // 		console.log("ABangle: "+Math.atan2(ice.getAttribute('position').z - cam.getAttribute('position').z,(ice.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI) - 90)+" sightAngle: "+(Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI) - 90));
 // 		console.log( Math.atan2(ice.getAttribute('position').z - cam.getAttribute('position').z,(ice.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI)) - (Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI)) + 45);
 		
-		panner.update(Math.atan2(ice.getAttribute('position').z - cam.getAttribute('position').z,(ice.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI)) - (Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI)) + 45,0);	
-		// 	console.log(Math.atan2(ice.getAttribute('position').z - cam.getAttribute('position').z,(ice.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI) - 90) - (Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI) - 90));	
+		panner.update(Math.atan2(player2.getAttribute('position').z - cam.getAttribute('position').z,(player2.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI)) - (Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI)) + 45,0);	
+			console.log(Math.atan2(player2.getAttribute('position').z - cam.getAttribute('position').z,(player2.getAttribute('position').x - cam.getAttribute('position').x ) * (180 / Math.PI) - 90) - (Math.atan2(  ray.raycaster.ray.direction.z  ,  ray.raycaster.ray.direction.x   )* (180 / Math.PI) - 90));	
 	}
 });
 
