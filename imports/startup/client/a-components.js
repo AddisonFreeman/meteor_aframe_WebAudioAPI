@@ -1,19 +1,11 @@
-var panner, cam, ice, ray;
+var panner, cam, ice, ray, peer;
 
+/*
+import { Meteor } from 'meteor/meteor';
+import { Peers } from "../server/startup";
 
-
-AFRAME.registerComponent('audio', {
-	schema: {type: 'vec3' },
-	init: function() {
-		
-// 	 window.addEventListener('touchstart', function() {
-		 	  // ----------------- Audio Things
-//       });
-	},
-	tick: function() {
-	    
-	}
-});
+Meteor.subscribe('peers');
+*/
 
 AFRAME.registerComponent('projectile', {
   schema: {
@@ -24,6 +16,7 @@ AFRAME.registerComponent('projectile', {
     this.el.object3D.translateY(this.data.speed);
   }
 });
+
 AFRAME.registerComponent('collider', {
   schema: {
     target: { default: '' }
@@ -130,7 +123,7 @@ AFRAME.registerComponent('click-listener', {
 
 
 
-AFRAME.registerComponent('ray', {
+AFRAME.registerComponent('positionalAudio', {
 	dependencies: ['raycaster'],
 	schema: {type: 'vec3' },
 	init: function() {
@@ -210,109 +203,60 @@ AFRAME.registerComponent('FOA', {
 	}
 });
 
-Template.peer.onCreated(function () {
-
-  window.peer = new Peer({
-    key: 'npgldigfyu3gcik9',
-    debug: 3,
-    config: {'iceServers': [
-      { url: 'stun:stun.l.google.com:19302' },
-      { url: 'stun:stun1.l.google.com:19302' },
-    ]}
-  });
-  peer.on('open', function () {
-    console.log(peer.id);
-  });
 
 
+AFRAME.registerComponent('peer', {
+	schema: {type: 'int', default: 2 },
+	init: function() {
+/*
+		var vowels = [1,5,9,15,21];
+		var one = Math.floor(Math.random()*10);
+		var three = Math.floor(Math.random()*10);
+		one = ($.inArray(one,vowels) != -1) ? one-1 : one;
+		three = ($.inArray(three,vowels) != -1) ? three-1 : three;
+		one = (one === three) ? one+2 : one;  
+		var pid = String.fromCharCode(97+ one)+''+String.fromCharCode(vowels[Math.floor(Math.random()*vowels.length)]+96)+''+String.fromCharCode(97+ three);
+*/
+   	    peer = new Peer({
+   			key: 'npgldigfyu3gcik9',
+   			debug: 3,
+   			config: {'iceServers': [
+	   			{ url: 'stun:stun.l.google.com:19302' },
+	   			{ url: 'stun:stun1.l.google.com:19302' },
+	   		]}
+	   	});
+	   	peer.on('open', function () {
+			console.log(peer.id);
+/*
+			Peers.insert({
+				pid,
+			}, (err, res) => {
+				if(!err) {
+				  console.log(Peers.find().fetch());					
+				}
+			});
+*/
+		});
+		peer.on('connection', function (conn) {
+		  console.log("you're connected!"+conn);
+		  conn.on('open', function() {
+		    conn.on('data', function(data) {
+		      ice.setAttribute('position', data);
+		    });
+		  });  
+		}); 	
+	},
+	tick: function() {
+			
+	}
 });
+
+
+
 
 window.onload = function() {
   cam = document.querySelector("#mainCamera");
   ice = document.querySelector("#iceberg");
-
-  peer.on('connection', function (conn) {
-    console.log("you're connected!"+conn);
-    conn.on('open', function() {
-      conn.on('data', function(data) {
-        ice.setAttribute('position', data);
-      });
-    });  
-  });
-
-
-  
-  //check if B above A on z-axis
-  // (iceberg.getAttribute('position').z - cam.getAttribute('position').z) > 0 
-
-  // && (iceberg.getAttribute('position').x - cam.getAttribute('position').x) > 0
-
-
-/*
-
-  updPos = function () {
-    panner.update((Math.atan2(iceberg.getAttribute('position').z - cam.getAttribute('position').z,((iceberg.getAttribute('position').x - cam.getAttribute('position').x)))) * (180 / Math.PI) - 90,0);
-    console.log("updated sound");
-    setTimeout(updPos(), 1000); 
-  }
-*/
-  
-
-//   setTimeout(updPos(), 1000);
-
-  // function iceberg() {
-  //   iceberg.setAttribute('position', (cam.getAttribute('position').x + 10+' '+cam.getAttribute('position').y+' '+cam.getAttribute('position').z));
-  // }
-  
-  
-  
-  // panner.update(0,0);
-  // setTimeout(function () {
-  //   panner.update(10,0);
-  //   console.log(10);
-  // },500);
-  //   setTimeout(function () {
-  //   panner.update(20,0);
-  //   console.log(20);
-  // },500);
-  // setTimeout(function () {
-  //   panner.update(30,0);
-  //   console.log(30);
-  // },500);
-  // setTimeout(function () {
-  //   panner.update(40,0);
-  //   console.log(40);
-  // },500);
-  // setTimeout(panner.update(50,0),500);
-  // setTimeout(panner.update(60,0),500);
-  // setTimeout(panner.update(70,0),500);
-  // setTimeout(panner.update(80,0),500);
-  // setTimeout(panner.update(90,0),500);
-  // setTimeout(panner.update(100,0),500);
-  // setTimeout(panner.update(90,0),500);
-  // setTimeout(panner.update(80,0),500);
-  // setTimeout(panner.update(70,0),500);
-  // setTimeout(panner.update(60,0),500);
-  // setTimeout(panner.update(50,0),500);
-  // setTimeout(panner.update(40,0),500);
-  // setTimeout(panner.update(30,0),500);
-  // setTimeout(panner.update(20,0),500);
-  // setTimeout(panner.update(10,0),500);
-  // setTimeout(panner.update(0,0),500);
-  // setTimeout(panner.update(-10,0),500);
-  // setTimeout(panner.update(-20,0),500);
-  // setTimeout(panner.update(-30,0),500);
-  // setTimeout(panner.update(-40,0),500);
-  // setTimeout(panner.update(-50,0),500);
-  // setTimeout(panner.update(-60,0),500);
-  // setTimeout(panner.update(-70,0),500);
-  // setTimeout(panner.update(-80,0),500);
-  // setTimeout(panner.update(-90,0),500);
-  // setTimeout(panner.update(-100,0),500);
-  
-  
-
-
 
 
 };
