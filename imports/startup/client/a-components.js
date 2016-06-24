@@ -1,11 +1,10 @@
-var panner, cam, ice, ray, peer;
+var panner, cam, ice, p2, ray, peer, peers, connections;
 
-/*
+
 import { Meteor } from 'meteor/meteor';
-import { Peers } from "../server/startup";
+import { Peers } from "../../api/peers/peers";
 
-Meteor.subscribe('peers');
-*/
+console.log(Peers);
 
 AFRAME.registerComponent('projectile', {
   schema: {
@@ -132,6 +131,7 @@ AFRAME.registerComponent('positionalAudio', {
 	  ray = this.raycaster;
 	  cam = document.querySelector("#mainCamera");
 	  ice = document.querySelector("#iceberg");
+	  p2 = document.querySelector("#player2");
 	  
 	  // ----------------- Audio Things
 	  var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -208,6 +208,7 @@ AFRAME.registerComponent('FOA', {
 AFRAME.registerComponent('peer', {
 	schema: {type: 'int', default: 2 },
 	init: function() {
+		connections = [];
 /*
 		var vowels = [1,5,9,15,21];
 		var one = Math.floor(Math.random()*10);
@@ -217,6 +218,8 @@ AFRAME.registerComponent('peer', {
 		one = (one === three) ? one+2 : one;  
 		var pid = String.fromCharCode(97+ one)+''+String.fromCharCode(vowels[Math.floor(Math.random()*vowels.length)]+96)+''+String.fromCharCode(97+ three);
 */
+		Meteor.subscribe('peers');
+
    	    peer = new Peer({
    			key: 'npgldigfyu3gcik9',
    			debug: 3,
@@ -226,42 +229,49 @@ AFRAME.registerComponent('peer', {
 	   		]}
 	   	});
 	   	peer.on('open', function () {
-			console.log(peer.id);
+	   		var pid = peer.id;
+	   		
+	   		peers = Peers.find().fetch();
+	   		console.log(peers);
+	   		
 /*
+	   		 peers.forEach((obj) => {
+		   		 Peers.remove(obj._id);
+			 });		
+
+	   	
+	   		peers = Peers.find().fetch();
+	   		console.log(peers);
+*/
+	   				
 			Peers.insert({
 				pid,
-			}, (err, res) => {
-				if(!err) {
-				  console.log(Peers.find().fetch());					
-				}
+			},
+			(err, res) => {
+				if(!err) {	
+			        peers.forEach((obj) => {
+				        connections.push(peer.connect(obj.pid));
+			        });				
+			    } else {
+				    console.log(err);
+			    }
 			});
-*/
 		});
 		peer.on('connection', function (conn) {
-		  console.log("you're connected!"+conn);
+		  console.log("you're connected! | "+conn);
 		  conn.on('open', function() {
 		    conn.on('data', function(data) {
-		      ice.setAttribute('position', data);
+		      p2.setAttribute('position', data);
 		    });
 		  });  
 		}); 	
-	},
+	}, //end init
 	tick: function() {
-			
+		connections.forEach( (c) => {
+			c.send(cam.getAttribute('position'));
+		});
 	}
 });
-
-
-
-
-window.onload = function() {
-  cam = document.querySelector("#mainCamera");
-  ice = document.querySelector("#iceberg");
-
-
-};
-
-
 
 
 //https://www.smashingmagazine.com/2016/06/make-music-in-the-browser-with-a-web-audio-theremin/

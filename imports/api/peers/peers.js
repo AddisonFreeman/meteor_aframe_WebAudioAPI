@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
-import { Factory } from 'meteor/factory';
+// import { Factory } from 'meteor/factory';
 
 class PeersCollection extends Mongo.Collection {
 	insert(peer, callback) {
@@ -16,16 +16,17 @@ class PeersCollection extends Mongo.Collection {
 export const Peers = new PeersCollection('Peers');
 
 Peers.deny({
-	insert() { return true; },
-	update() { return true; },
-	remove() { return true; },
+// 	insert() { return true; },
+// 	update() { return true; },
+// 	remove() { return true; },
 });
 
 Peers.schema = new SimpleSchema({
 	pid: { type: String },	
-})
+});
 
 Peers.attachSchema(Peers.schema);
+
 
 Peers.constructorParams = {
 	key: 'npgldigfyu3gcik9',
@@ -36,8 +37,10 @@ Peers.constructorParams = {
 	]}
 };
 
-Factory.define('peers', Peers, {});
+// Factory.define('peers', Peers, {});
+/*
 
 Peers.helpers({
 	//what goes here?
 });
+*/
