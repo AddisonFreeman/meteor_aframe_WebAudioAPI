@@ -1,4 +1,4 @@
-var panner, cam, ice, p2, pfetch, player2, pid, ray, peer, users, peers, connections, pSelectorId;
+var panner, cam, ice, p2, pfetch, player2, pid, ray, peer, users, peers, connections, pSelectorId, ground, tiltLR, tiltFB, dir, accX, accY, accZ, rollStart, rollEnd;
 
 
 import { Meteor } from 'meteor/meteor';
@@ -195,63 +195,107 @@ AFRAME.registerComponent('FOA', {
 });
 */
 
+AFRAME.registerComponent('tilt', {
+	init: () => {
+		iceberg = document.querySelector("#iceberg");
+		console.log(window.DeviceOrientationEvent);
+		rollStart = false;
+		window.ontouchstart = (e) => {
+			rollStart = true;
+			rollEnd = false;
+		}
+		window.ondevicemotion = (e) => {
+			accX = e.accelerationIncludingGravity.x;
+			accY = e.accelerationIncludingGravity.y;
+			accZ = e.accelerationIncludingGravity.z;
+		}
+		window.ontouchend = (e) => {
+			rollEnd = true;
+		}
+	},
+	tick: () => {
+		if(rollStart && !rollEnd) {
+			console.log(Math.floor(accX)+" "+Math.floor(accY)+" "+Math.floor(accZ));
+			iceberg.setAttribute('position', Math.floor(accX)+" 10 "+Math.floor(accZ));
+			iceberg.setAttribute('rotation', Math.floor(Math.pow(accX,2))+" "+Math.floor(Math.pow(accY,2))+" "+Math.floor(Math.pow(accZ,2)));
+		} else if (rollEnd) {
+			iceberg.setAttribute('kinematic-body');
+		}
+	}
+});
+
 AFRAME.registerComponent('user', {
+	dependencies: ['raycaster'],
 	init: () => {
 		connections = [];
 		cam = document.querySelector("#mainCamera");
 		player2 = document.querySelector("#player2");
-		Meteor.subscribe('users', () => {
-			users = Users.find().fetch();
-			console.log(users);
- 		   //  users.forEach((obj) => {
-		    //     Users.remove(obj._id);
-		   	// });
-			user = new Peer(Users.constructorParams);
-			user.on('open', () => {
-				//connect to other users when they join
- 				var camPID = user.id;
- 				console.log("My pid is: "+camPID.substr(0,3));
- 				Users.insert({
-		 			pid: camPID,
-		 			pos: "0 0 0",
-				}, (err, res) => {
-			 		if(!err) {
-		 			} else {
-				 		console.log("camPID: "+camPID+" not added to Users Collection");
-				 		console.log(err);
-		 			}
- 				});		
- 				Users.find().observeChanges({
-	 				added: (id,otherUser) => {	
-	 					console.log(otherUser.pid.substr(0,3));
-		 				if(otherUser.pid!=camPID) {
-		 					console.log("uAddedPID");
-	 						console.log(otherUser.pid.substr(0,3));
-					 		connections.push(user.connect(otherUser.pid));
-		 				}
-	 				}
- 				});
-			    console.log(Users.find().fetch());
-				user.on('connection', function (conn) {
-				    conn.on('open', function() {
-				  	    console.log("peer "+conn.peer.substr(0,3)+" added");
-					    conn.on('data', function(data) {
-				    	    console.log(data);
-				       	    console.log(player2);
-				       	    document.querySelector("#player2").setAttribute('position', data);
-				        });
-				    });	
+		// console.log(this.DeviceMotionEvent.acceleration);
+	  	// this.raycaster = this.el.components.raycaster;
+	  	// ray = this.raycaster;
+		// Meteor.subscribe('users', () => {
+		// 	users = Users.find().fetch();
+		// 	console.log(users);
+ 	// 	    users.forEach((obj) => {
+		//         Users.remove(obj._id);
+		//    	});
+		// 	// user = new Peer(Users.constructorParams);
+		// 	user.on('open', () => {
+		// 		//connect to other users when they join
+ 	// 			var camPID = user.id;
+ 	// 			console.log("My pid is: "+camPID.substr(0,3));
+ 	// 			Users.insert({
+		//  			pid: camPID,
+		//  			pos: "0 0 0",
+		// 		}, (err, res) => {
+		// 	 		if(!err) {
+		//  			} else {
+		// 		 		console.log("camPID: "+camPID+" not added to Users Collection");
+		// 		 		console.log(err);
+		//  			}
+ 	// 			});		
+ 	// 			Users.find().observeChanges({
+	 // 				added: (id,otherUser) => {	
+	 // 					console.log(otherUser.pid.substr(0,3));
+		//  				if(otherUser.pid!=camPID) {
+		//  					console.log("uAddedPID");
+	 // 						console.log(otherUser.pid.substr(0,3));
+		// 			 		connections.push(user.connect(otherUser.pid));
+		//  				}
+	 // 				}
+ 	// 			});
+		// 	    console.log(Users.find().fetch());
+		// 		user.on('connection', function (conn) {
+		// 		    conn.on('open', function() {
+		// 		  	    console.log("peer "+conn.peer.substr(0,3)+" added");
+		// 			    conn.on('data', function(data) {
+		// 		    	    console.log(data);
+		// 		       	    console.log(player2);
+		// 		       	    document.querySelector("#player2").setAttribute('position', data.pos);
+		// 		        });
+		// 		    });	
 				
-		    	});		 
-			});
-		});
+		//     	});		 
+		// 	});
+		// });
 	},
 	tick: function() {
+		// console.log(ray.raycaster.ray.direction);
 		connections.forEach( (c) => {
-			c.send(cam.getAttribute('position'));
+			c.send( {
+				pos: cam.getAttribute('position'), 
+				ray: 1
+			});
 		});
 	}
 });
+
+
+// window.ondevicemotion = function(event) {
+//  console.log(Math.floor(event.accelerationIncludingGravity.x)+' '+
+//  Math.floor(event.accelerationIncludingGravity.y)+' '+
+//  Math.floor(event.accelerationIncludingGravity.z));
+// }
 
 //https://www.smashingmagazine.com/2016/06/make-music-in-the-browser-with-a-web-audio-theremin/
 
