@@ -13,15 +13,14 @@
 					  debug: true;
 					  pairCode: 'poetic';
 					  enableOverlay: true;">
-			<a-assets>			  
-			 
-			 <a-mixin 
+		<a-assets>			  	 
+			<a-mixin 
 				id="laser"
 				static-body
             	geometry="primitive: box; 
-            			  depth: 4; 
-            			  height: .1; 
-            			  width: 4;"
+            			  depth: 1; 
+            			  height: 1; 
+            			  width: 5;"
 				material="color: green; 
 						  metalness: 0.2; 
 						  opacity: 0.4; 
@@ -30,10 +29,11 @@
 				xprojectile="speed: -0.5"
 				xcollider="target: .stick">
 			</a-mixin>
-			
 			<a-mixin 
+        id="playerPlaceholder"
 			  class="otherPlayer"
 			  static-body
+			  peer
 			  color="#000" 
 			  width="1" 
 			  height="4" 
@@ -42,9 +42,8 @@
               rotation="0 0 0" 
               scale="1 1 1">
 			</a-mixin>
-			
-			
-		   </a-assets>
+		</a-assets>   
+
         <a-box 
 	   	  id="player2"
    		  static-body 
@@ -58,7 +57,7 @@
           scale="1 1 1">
         </a-box>
 
-
+<!--
         <a-box 
 	   	  id="player3"
    		  static-body 
@@ -71,7 +70,8 @@
           rotation="0 0 0" 
           scale="1 1 1">
         </a-box>
-   <!--     
+-->
+<!--     
         <a-box 
 	   	  id="player4"
    		  static-body 
@@ -85,11 +85,9 @@
           scale="1 1 1">
         </a-box>        
 -->
-
-
    		<a-box 
    		  id="iceberg"
-	   	  class=".stick"
+	   	  class="stick"
    		  static-body 
    		  color="#CBF" 
    		  width="4" 
@@ -102,17 +100,14 @@
                         from="1" to="0.5"></a-animation>
            <a-animation attribute="scale" begin="collider-hit" dur="400" ease="linear"
                         to="5 5 5"></a-animation>
-        </a-box>
-        
-
-        
+        </a-box>     
         <a-box 
    		  id="y" 
    		  color="#704" 
    		  width="1" 
    		  height=".0001" 
    		  depth="100"
-          position="0 1 0" 
+          position="0 .0001 0" 
           rotation="0 0 0" 
           scale="1 1 1">
         </a-box>
@@ -122,18 +117,19 @@
    		  width="100" 
    		  height=".0001" 
    		  depth="1"
-          position="0 1 0" 
+          position="0 .0001 0" 
           rotation="0 0 0" 
           scale="1 1 1">
         </a-box>
   		<!-- ground -->
   		<a-entity 
   			static-body
-	  		class="stick" 
   			geometry="primitive: box; 
-  					  depth:100; 
-  					  height:1; 
-  					  width:100;" 
+  					  height:100; 
+  					  width:100;
+	  				  depth: 1" 
+	  		rotation="90 0 0"
+		  	position="0 -1 0"
   			material="side: double; 
   					  color: blue; 
   					  repeat: 100000000 1000000;">
@@ -141,28 +137,45 @@
   		<a-entity
   			id="mainCamera" 
   			camera 
+  			user
 	  		xspawner="mixin: laser; on: click" 
-		  	xclick-listener
+		  	click-listener
 	  		cursor
   			universal-controls
   			keyboard-controls
   			gamepad-controls 
   			kinematic-body 
-  			jump-ability="enableDoubleJump: true; 
-  						  distance: 10;" 
-		    position="0 1 0">
-			    
-			    
+  			jump-ability="enableDoubleJump: false; 
+  						  distance: 4;" 
+		    position="0 1 0">    
 			<a-entity 
 				id="ray"
-				positionalAudio
-				cursor="fuse: true; maxDistance: 30; timeout: 500"
+				xpositionalAudio
+				xcursor="fuse: true; maxDistance: 10000; timeout: 500"
             	position="0 0 -10"
-				geometry="primitive: ring"
-				material="color: red; shader: flat">
-  </a-entity>
-			    
-			    
+				xgeometry="primitive: sphere;
+					      radius: 5"
+				xmaterial="color: red; opacity:0.3">
+<!--			cursorBomb travel -->
+		  		<a-animation attribute="position"
+				  	easing="ease"
+			   		fill="none"
+		  			from="0 0 -10"
+		  			to = "0 0 -50">
+		  		</a-animation>
+<!--			cursorBombgrow 
+				<a-animation attribute="scale"
+					from="0 0 -10"
+					to = "0 0 -50"
+					growBombListener>
+				</a-animation>
+			cursorBombTarget 
+				<a-animation attribute="color"
+					from="0 0 -10"
+					to = "0 0 -50"
+					growBombListener>
+				</a-animation> -->
+			</a-entity>
   		</a-entity>
 	</a-scene>
 </body>
